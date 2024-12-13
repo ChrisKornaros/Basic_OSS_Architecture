@@ -8,3 +8,8 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Local Files
+*.DS_Store
+
+# Quarto Files

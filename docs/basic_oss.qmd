@@ -1,0 +1,37 @@
+---
+title: "Basic OSS Architecture"
+---
+
+The purpose of this project is to showcase the power of open source tools when designing a data and analytics system. I will be walking through my workflow step by step, and including both images, code, and notes.
+
+## Project Initialization
+First, I begin in my home directory. Then, I change to my Documents directory, which I use for all of my projects. This is where I'll begin creating the project directory and initializing the subsequent tools. As you'll see below, I first initialize the uv repository and change into it. Then, I create the repo on GitHub (because I like generating the license then), pull (my global is set to merge), commit, and make the initial push. Then, I will initialize the Quarto project, to begin documentation as I work. 
+
+![Project and Repo Initialization](images/uv_gh_init.png)
+
+![Basic Uv Environment](images/uv_base_env.png)
+
+![Git Remote Add and Pull](images/gh_remote_add.png)
+
+![First Commit](images/first_commit.png)
+
+
+#### The Pyproject.toml file
+
+```python
+[project]
+name = "basic-oss-architecture"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "dbt>=1.0.0.38.22",
+    "duckdb>=1.1.3",
+    "great-expectations>=0.18.22",
+    "jupyter>=1.1.1",
+    "pandas>=2.2.3",
+    "pytest>=8.3.4",
+    "quarto>=0.1.0",
+]
+```
