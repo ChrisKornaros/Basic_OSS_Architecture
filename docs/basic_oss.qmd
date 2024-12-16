@@ -45,6 +45,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "dbt-duckdb>=1.9.1",
     "dbt>=1.0.0.38.22",
     "duckdb>=1.1.3",
     "great-expectations>=0.18.22",
@@ -63,4 +64,54 @@ Below is an example of my file at this early project stage.
 ![](images/gitignore_sample.png)
 
 ### Initializing a Data Environment
-Now, you'll be setting up dbt. Similar to the other CLI tools, dbt uses the `dbt init` command
+Now, you'll be setting up dbt. Similar to the other CLI tools, dbt uses the `dbt init` command to create the folder structure necessary for the program to be effective. As you can see below, the process is very easy. You'll only enter a name for your project, which will (case sensitively) become the name of the dbt directory. Next, we'll walk through the fundamental pieces of a dbt project in depth. 
+
+![](images/dbt_init.png)
+
+### The Data Build Tool (dbt)
+As I said, creating a dbt project is easy, but it can get confusing from here on out if you're alone with the [dbt documentation](https://docs.getdbt.com/guides/manual-install?step=1). In my experience, dbt initalizes a `logs/` folder in the project root directory **not** the dbt root directory. So, I make sure to add that to the gitignore file, because I don't think that needs to be checked into version control.
+
+So, now that you've initialized your folder, let's go through the basics: 
+
+#### Project Root: Basic_OSS
+In the case of my project, the root folder is called `Basic_OSS`. Here, you'll find the 6 subdirectories, a `.gitignore` file, a `README.md` file, and the `dbt_project.yml` file. The `.gitignore` can be deleted, because you have one in the project root directory, and for the same reason, so can the README. The dbt project file is the core of your entire data environment, in the same exact way that a `_quarto.yml` file is the core of your website, book, or documentation project. 
+
+This is where you'll configure the actual structure and hierarchy of your environment, along with things like schemas or variables, or aliases. 
+
+#### Analyses
+Contains the SQL files for any analysis done that are not part of the core models. Think of these as the `SELECT` statements for analytical queries, whereas models handle the `DDL` statements for database architects. Depending on your workflow, this folder could be unused.
+
+#### Macros
+This is where you can store custom macros (functions) and reusable code written in either SQL or `jinja`. This is the Python package equivalent for SQL and it's often used to ensure **DRY** (Don't Repeat Yourself) principles for ETL and other database work.
+
+#### Models
+This is the core of dbt. Models are the SQL tables themselves, as well as the transformations when cleaning and aggregating data (from raw to reporting). If you have a raw schema (where the raw data is temporarily stored) and a clean schema (where cleaned data is persisted), you would have both a `raw` and `clean` folder within the `models` folder. Then, the individual queries would live within those subfolders as the actual tables and views. 
+
+It is where most of (if not all) your transformations live. So, can become computationally taxing if you aren't careful. 
+
+Run with `dbt run` or `dbt run --select {model_directory_name}`.
+
+#### Seeds
+These are flat files containing static data used for mapping (or reference) data. Only use this if your project needs static data. For more on [seeds](https://docs.getdbt.com/reference/seed-configs).
+
+Run with `dbt seed`.
+
+#### Snapshots
+Stores snapshot definitions for versioning and tracking changes in source data over time. These are commonly used for **SCDs** (slowly changing dimensions) or auditing.
+
+Run with `dbt snapshot`.
+
+#### Tests
+Fairly self explanatory, but this folder contains custom, SQL-defined tests for your models. Dbt allows for both custom tests defined in `.sql` files and *generic* tests defined in a `YAML`. The tests run on various models are defined in the dbt_project.yml file. 
+
+#### Extra Notes
+Dbt also has the `docs/` and `dbt_packages/` folders which are for advanced documentation and shareable, modularized code, respectively. Generally speaking, your workflow will really only involve the following parts of a dbt project:
+
+1. `models/`
+2. `tests/`
+3. `macros/`
+4. `dbt_project.yml`
+
+The others are optional and provide functionality, that while useful and powerful in many cases, is not always needed. Now that we've got the local directory all configured, it's time to start building the container for our PostgreSQL instance (server, cluster, whatever you want to call it).
+
+### Docker and Containers
