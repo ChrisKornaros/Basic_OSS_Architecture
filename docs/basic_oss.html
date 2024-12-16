@@ -128,10 +128,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <figcaption>First Commit</figcaption>
 </figure>
 </div>
-</section>
-<section id="moving-on" class="level3">
-<h3 class="anchored" data-anchor-id="moving-on">Moving On</h3>
-<p>Now, it’s time to setup some extra functionality in the project. I’m going to be using Quarto for documentation, so I’ll run <code>quarto create project</code>. To learn more about Quarto and configuring your documentation in projects, checkout my <a href="https://ChrisKornaros.github.io/guides/quarto/">guide</a>. That being said, if you are ever taking screenshots of your work and want to quickly move them into your images folder, you can do so from the CLI.</p>
+<section id="adding-quarto" class="level4">
+<h4 class="anchored" data-anchor-id="adding-quarto">Adding Quarto</h4>
+<p>Now, it’s time to setup some extra functionality in the project. I’m going to be using Quarto for documentation, so I’ll run <code>quarto create project</code>. To learn more about Quarto and configuring your documentation in projects, checkout my <a href="https://ChrisKornaros.github.io/guides/quarto/">guide</a>. It’s a fantastic tool for building beautiful, robust documentation, even in enterprise production environments. Consider it for future papers, websites, dashboards, and reports.</p>
+<p>That being said, if you are ever taking screenshots of your work and want to quickly move them into your images folder, you can do so from the CLI.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="images/quarto_init.png" class="img-fluid figure-img"></p>
@@ -151,6 +151,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <figcaption>Add Dependencies with uv</figcaption>
 </figure>
 </div>
+</section>
 <section id="the-pyproject.toml-file" class="level4">
 <h4 class="anchored" data-anchor-id="the-pyproject.toml-file">The Pyproject.toml file</h4>
 <p>Once that’s done, uv will update the general dependencies in the <code>pyproject.toml</code> file and the specific versions in <code>uv.lock</code> (think requirements.txt on steroids). The nice thing here, it only lists the actual package you needed, not everything else that the package requires. So, when you want to remove packages you can simply use <code>uv remove</code> and the individual package names listed here to remove <em>everything</em> in your environment. There’s an example below.</p>
@@ -161,20 +162,181 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>readme <span class="op">=</span> <span class="st">"README.md"</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>requires<span class="op">-</span>python <span class="op">=</span> <span class="st">"&gt;=3.13"</span></span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>dependencies <span class="op">=</span> [</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"dbt&gt;=1.0.0.38.22"</span>,</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"duckdb&gt;=1.1.3"</span>,</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"great-expectations&gt;=0.18.22"</span>,</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"jupyter&gt;=1.1.1"</span>,</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"pandas&gt;=2.2.3"</span>,</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"pytest&gt;=8.3.4"</span>,</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"quarto&gt;=0.1.0"</span>,</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"dbt-duckdb&gt;=1.9.1"</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"dbt&gt;=1.0.0.38.22"</span>,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"duckdb&gt;=1.1.3"</span>,</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"great-expectations&gt;=0.18.22"</span>,</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"jupyter&gt;=1.1.1"</span>,</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"pandas&gt;=2.2.3"</span>,</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"pytest&gt;=8.3.4"</span>,</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"quarto&gt;=0.1.0"</span>,</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="using-.gitignore-effectively" class="level4">
 <h4 class="anchored" data-anchor-id="using-.gitignore-effectively">Using .gitignore effectively</h4>
-<p>You probably noticed, but when you initialize a project with <code>uv</code> it automatically creates a <code>.gitignore</code> file and populates it with basic files and directories which don’t need to be checked into source control (like .venv). I take this a step further, and add some Quarto specific files and directories too, <code>.quarto</code> and <code>_files</code> folders. Below is an example of my file at this early project stage.</p>
+<p>You probably noticed, but when you initialize a project with <code>uv</code> it automatically creates a <code>.gitignore</code> file and populates it with basic files and directories which don’t need to be checked into source control (like .venv). I take this a step further, and add some Quarto specific files and directories too, <code>.quarto</code> and <code>_files</code> folders. Managing this file effectively can drastically reduce the file size of your commits.</p>
+<p>Below is an example of my file at this early project stage.</p>
 <p><img src="images/gitignore_sample.png" class="img-fluid"></p>
 </section>
+</section>
+<section id="initializing-a-data-environment" class="level3">
+<h3 class="anchored" data-anchor-id="initializing-a-data-environment">Initializing a Data Environment</h3>
+<p>Now, you’ll be setting up dbt. Similar to the other CLI tools, dbt uses the <code>dbt init</code> command to create the folder structure necessary for the program to be effective. As you can see below, the process is very easy. You’ll only enter a name for your project, which will (case sensitively) become the name of the dbt directory. Next, we’ll walk through the fundamental pieces of a dbt project in depth.</p>
+<p><img src="images/dbt_init.png" class="img-fluid"></p>
+</section>
+<section id="the-data-build-tool-dbt" class="level3">
+<h3 class="anchored" data-anchor-id="the-data-build-tool-dbt">The Data Build Tool (dbt)</h3>
+<p>As I said, creating a dbt project is easy, but it can get confusing from here on out if you’re alone with the <a href="https://docs.getdbt.com/guides/manual-install?step=1">dbt documentation</a>. In my experience, dbt initalizes a <code>logs/</code> folder in the project root directory <strong>not</strong> the dbt root directory. So, I make sure to add that to the gitignore file, because I don’t think that needs to be checked into version control.</p>
+<p>So, now that you’ve initialized your folder, let’s go through the basics:</p>
+<section id="project-root-basic_oss" class="level4">
+<h4 class="anchored" data-anchor-id="project-root-basic_oss">Project Root: Basic_OSS</h4>
+<p>In the case of my project, the root folder is called <code>Basic_OSS</code>. Here, you’ll find the 6 subdirectories, a <code>.gitignore</code> file, a <code>README.md</code> file, and the <code>dbt_project.yml</code> file. The <code>.gitignore</code> can be deleted, because you have one in the project root directory, and for the same reason, so can the README. The dbt project file is the core of your entire data environment, in the same exact way that a <code>_quarto.yml</code> file is the core of your website, book, or documentation project.</p>
+<p>This is where you’ll configure the actual structure and hierarchy of your environment, along with things like schemas or variables, or aliases.</p>
+</section>
+<section id="analyses" class="level4">
+<h4 class="anchored" data-anchor-id="analyses">Analyses</h4>
+<p>Contains the SQL files for any analysis done that are not part of the core models. Think of these as the <code>SELECT</code> statements for analytical queries, whereas models handle the <code>DDL</code> statements for database architects. Depending on your workflow, this folder could be unused.</p>
+</section>
+<section id="macros" class="level4">
+<h4 class="anchored" data-anchor-id="macros">Macros</h4>
+<p>This is where you can store custom macros (functions) and reusable code written in either SQL or <code>jinja</code>. This is the Python package equivalent for SQL and it’s often used to ensure <strong>DRY</strong> (Don’t Repeat Yourself) principles for ETL and other database work.</p>
+</section>
+<section id="models" class="level4">
+<h4 class="anchored" data-anchor-id="models">Models</h4>
+<p>This is the core of dbt. Models are the SQL tables themselves, as well as the transformations when cleaning and aggregating data (from raw to reporting). If you have a raw schema (where the raw data is temporarily stored) and a clean schema (where cleaned data is persisted), you would have both a <code>raw</code> and <code>clean</code> folder within the <code>models</code> folder. Then, the individual queries would live within those subfolders as the actual tables and views.</p>
+<p>It is where most of (if not all) your transformations live. So, can become computationally taxing if you aren’t careful.</p>
+<p>Run with <code>dbt run</code> or <code>dbt run --select {model_directory_name}</code>.</p>
+</section>
+<section id="seeds" class="level4">
+<h4 class="anchored" data-anchor-id="seeds">Seeds</h4>
+<p>These are flat files containing static data used for mapping (or reference) data. Only use this if your project needs static data. For more on <a href="https://docs.getdbt.com/reference/seed-configs">seeds</a>.</p>
+<p>Run with <code>dbt seed</code>.</p>
+</section>
+<section id="snapshots" class="level4">
+<h4 class="anchored" data-anchor-id="snapshots">Snapshots</h4>
+<p>Stores snapshot definitions for versioning and tracking changes in source data over time. These are commonly used for <strong>SCDs</strong> (slowly changing dimensions) or auditing.</p>
+<p>Run with <code>dbt snapshot</code>.</p>
+</section>
+<section id="tests" class="level4">
+<h4 class="anchored" data-anchor-id="tests">Tests</h4>
+<p>Fairly self explanatory, but this folder contains custom, SQL-defined tests for your models. Dbt allows for both custom tests defined in <code>.sql</code> files and <em>generic</em> tests defined in a <code>YAML</code>. The tests run on various models are defined in the dbt_project.yml file.</p>
+</section>
+<section id="extra-notes" class="level4">
+<h4 class="anchored" data-anchor-id="extra-notes">Extra Notes</h4>
+<p>Dbt also has the <code>docs/</code> and <code>dbt_packages/</code> folders which are for advanced documentation and shareable, modularized code, respectively. Generally speaking, your workflow will really only involve the following parts of a dbt project:</p>
+<ol type="1">
+<li><code>models/</code></li>
+<li><code>tests/</code></li>
+<li><code>macros/</code></li>
+<li><code>dbt_project.yml</code></li>
+</ol>
+<p>The others are optional and provide functionality, that while useful and powerful in many cases, is not always needed. Now that we’ve got the local directory all configured, it’s time to start building the container for our PostgreSQL instance (server, cluster, whatever you want to call it).</p>
+</section>
+</section>
+</section>
+<section id="docker-and-containers" class="level2">
+<h2 class="anchored" data-anchor-id="docker-and-containers">Docker and Containers</h2>
+<p>Docker is a powerful open-source platform that simplifies the process of developing, packaging, and deploying applications using containers, which are lightweight, portable environments. Unlike traditional virtualization, which replicates an entire computer system, containers virtualize at the operating system (OS) level, creating isolated spaces where applications run with all their dependencies. By isolating apps in containers, Docker ensures that each environment is consistent across different systems, reducing conflicts caused by mismatched dependencies. This approach accelerates development, enhances portability, and enables scalability, making Docker a cornerstone of modern microservices architectures and containerized workflows.</p>
+<p>You can learn more about Docker either through their open source <a href="https://docs.docker.com">documentation</a> or DataCamp’s <a href="https://app.datacamp.com/learn/courses/introduction-to-docker">course</a> by Tim Sangster!</p>
+<section id="the-dockerfile-and-configuring-your-image" class="level3">
+<h3 class="anchored" data-anchor-id="the-dockerfile-and-configuring-your-image">The Dockerfile and Configuring Your Image</h3>
+<p>The <code>Dockerfile</code> is the foundation of Docker image creation, serving as a script of instructions to define the environment and behavior of your containerized application. Each instruction in the <code>Dockerfile</code> builds on the previous one, forming layers that together create a Docker image.</p>
+<p>A <code>Dockerfile</code> is composed of various instructions, such as:</p>
+<ul>
+<li><p><strong>FROM</strong>: Specifies the base image to start with. Always begin with this instruction.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode dockerfile code-with-copy"><code class="sourceCode dockerfile"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> postgres</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p><strong>RUN</strong>: Executes shell commands during the build process and creates a new layer.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode dockerfile code-with-copy"><code class="sourceCode dockerfile"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">apt-get</span> update</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p><strong>COPY/ADD</strong>: Transfers files from your local system into the image.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode dockerfile code-with-copy"><code class="sourceCode dockerfile"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">COPY</span> app.py /usr/home/scripts</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p><strong>WORKDIR</strong>: Sets the working directory for subsequent instructions.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode dockerfile code-with-copy"><code class="sourceCode dockerfile"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WORKDIR</span> /usr/home/scripts</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p><strong>CMD</strong>: Specifies the default command to run when the container starts. Unlike <code>RUN</code>, <code>CMD</code> is executed at runtime.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode dockerfile code-with-copy"><code class="sourceCode dockerfile"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CMD</span> [<span class="st">"pwd"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+</ul>
+<section id="optimizing-builds-with-caching" class="level4">
+<h4 class="anchored" data-anchor-id="optimizing-builds-with-caching">Optimizing Builds with Caching</h4>
+<p>Docker employs a layer-caching mechanism to optimize builds. Each instruction in the <code>Dockerfile</code> forms a layer, and Docker reuses unchanged layers in subsequent builds to save time. For example:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode dockerfile code-with-copy"><code class="sourceCode dockerfile"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">apt-get</span> update</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">apt-get</span> install <span class="at">-y</span> python3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>If you rebuild and these instructions remain unchanged, Docker uses cached results. However, if the base image or any instruction changes, the cache is invalidated for that layer and subsequent ones.</p>
+<div class="callout callout-style-default callout-tip callout-titled" title="Maximize Cache Efficiency">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Maximize Cache Efficiency
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Reorder <code>Dockerfile</code> instructions to maximize cache efficiency. Place less frequently changing instructions higher in the file. Then, place the layers you need to test changes in more frequently, lower in the file.</p>
+</div>
+</div>
+</section>
+<section id="using-variables-in-dockerfiles" class="level4">
+<h4 class="anchored" data-anchor-id="using-variables-in-dockerfiles">Using Variables in Dockerfiles</h4>
+<p>Variables make <code>Dockerfiles</code> more flexible and maintainable.</p>
+<ul>
+<li><p><strong>ARG</strong>: Sets build-time variables.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode dockerfile code-with-copy"><code class="sourceCode dockerfile"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ARG</span> APP_PORT=5000</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="bu">echo</span> <span class="st">"Application port: </span><span class="va">$APP_PORT</span><span class="st">"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><code>ARG</code> values are accessible only during the build process.</p></li>
+<li><p><strong>ENV</strong>: Sets environment variables for runtime.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode dockerfile code-with-copy"><code class="sourceCode dockerfile"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ENV</span> APP_ENV=production</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>These variables persist after the image is built and can be overridden when running the container using the <code>--env</code> flag.</p></li>
+</ul>
+<div class="callout callout-style-default callout-important callout-titled" title="Credentials">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Credentials
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Avoid storing sensitive data like credentials in <code>ARG</code> or <code>ENV</code>, as they are visible in the image’s history.</p>
+</div>
+</div>
+</section>
+<section id="security-best-practices" class="level4">
+<h4 class="anchored" data-anchor-id="security-best-practices">Security Best Practices</h4>
+<ol type="1">
+<li><p><strong>Use Official Images</strong>: Base your <code>Dockerfile</code> on trusted, well-maintained images from sources like Docker Hub.</p></li>
+<li><p><strong>Minimize Packages</strong>: Install only what your application needs to reduce potential vulnerabilities.</p></li>
+<li><p><strong>Avoid Root Users</strong>: Run applications with restricted permissions by creating a non-root user:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode dockerfile code-with-copy"><code class="sourceCode dockerfile"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">useradd</span> <span class="at">-m</span> appuser</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">USER</span> appuser</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p><strong>Update Regularly</strong>: Keep your base images and software dependencies up to date.</p></li>
+</ol>
+</section>
+</section>
+<section id="dockerfile-for-postgresql" class="level3">
+<h3 class="anchored" data-anchor-id="dockerfile-for-postgresql">Dockerfile for PostgreSQL</h3>
+<p>Below is an example Dockerfile for setting up PostgreSQL:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode dockerfile code-with-copy"><code class="sourceCode dockerfile"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use an official PostgreSQL base image</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> postgres</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Set environment variables</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="kw">ENV</span> POSTGRES_USER=myuser</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="kw">ENV</span> POSTGRES_PASSWORD=mypassword</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="kw">ENV</span> POSTGRES_DB=mydatabase</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Expose the PostgreSQL port</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="kw">EXPOSE</span> 5432</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Run commands to configure the environment</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">apt-get</span> update <span class="kw">&amp;&amp;</span> <span class="ex">apt-get</span> install <span class="at">-y</span> <span class="dt">\</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    libpq-dev <span class="dt">\</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&amp;&amp;</span> <span class="fu">rm</span> <span class="at">-rf</span> /var/lib/apt/lists/<span class="pp">*</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Copy additional configuration files (optional)</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="kw">COPY</span> my_postgres.conf /etc/postgresql/postgresql.conf</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Start PostgreSQL service when the container runs</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a><span class="kw">CMD</span> [<span class="st">"postgres"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This Dockerfile creates a container for PostgreSQL with specified user, password, and database name, and includes an example of adding additional configuration files.</p>
 </section>
 </section>
 

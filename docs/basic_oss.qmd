@@ -135,15 +135,15 @@ A `Dockerfile` is composed of various instructions, such as:
   ```
 - **COPY/ADD**: Transfers files from your local system into the image.
   ```dockerfile
-  COPY app.py /usr/home/scripts
+  COPY postgres-password.txt /usr/home/
   ```
 - **WORKDIR**: Sets the working directory for subsequent instructions.
   ```dockerfile
-  WORKDIR /usr/home/scripts
+  WORKDIR /usr/home/
   ```
 - **CMD**: Specifies the default command to run when the container starts. Unlike `RUN`, `CMD` is executed at runtime.
   ```dockerfile
-  CMD ["pwd"]
+  CMD ["postgres"]
   ```
 
 #### Optimizing Builds with Caching
@@ -152,7 +152,7 @@ Docker employs a layer-caching mechanism to optimize builds. Each instruction in
 
 ```dockerfile
 RUN apt-get update
-RUN apt-get install -y python3
+RUN apt-get install -y libpq-dev
 ```
 
 If you rebuild and these instructions remain unchanged, Docker uses cached results. However, if the base image or any instruction changes, the cache is invalidated for that layer and subsequent ones.
@@ -193,3 +193,104 @@ Avoid storing sensitive data like credentials in `ARG` or `ENV`, as they are vis
    ```
 4. **Update Regularly**: Keep your base images and software dependencies up to date.
 
+### Write a PostgreSQL Dockerfile and Build the Image
+Below is an example Dockerfile for setting up PostgreSQL, with specified user, password, and database name:
+
+```dockerfile
+# Use an official PostgreSQL base image
+FROM postgres
+
+# Set environment variables from a local file
+COPY .pg-password /etc/postgresql/.pg-password
+
+# Read the password from the file and set it as an environment variable
+RUN POSTGRES_PASSWORD=$(cat /etc/postgresql/.pg-password)
+
+# Set additional environment variables
+ENV POSTGRES_USER=chris
+ENV POSTGRES_DB=test
+
+# Expose the PostgreSQL port
+EXPOSE 5432
+
+# Run commands to configure the environment
+RUN apt-get update && apt-get install -y \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Start PostgreSQL service when the container runs
+CMD ["postgres"]
+``` 
+
+For the purposes of simplicity in this guide, I'm just going to leave the POSTGRES_ variables as they are in the file. The password I'll keep separate to demonstrate how that would work. That being said, after you've writen the image's Dockerfile, you'll build the image.
+
+```bash
+docker build -t test .
+```
+
+If you need to remove the image at any point, first make sure there are no containers using it, then run the following:
+
+```bash
+docker rmi test
+```
+
+### Running the Container
+Next, to run the container, you'll be adding a few flags, which I'll explain below. For simplicity sake, it's probably easiest to store this in a script somewhere and then execute that on start up. `**Note** to myself: Add a section on writing local scripts/executables like this later on in the guide.`
+
+```bash
+docker run \
+  --name pg_test \
+  -e POSTGRES_PASSWORD_FILE=/etc/postgresql/.pg-password \
+  -e POSTGRES_USER=chris \
+  -e POSTGRES_DB=test \
+  -p 5432:5432 \
+  test
+```
+
+#### Flags Explained
+The code above will run a container using the Docker image `test` as the base. 
+
+- The container will have the `--name` **pg_test**
+- You'll use the file located at `/etc/postgresql/.pg-password` to define the `POSTGRES_PASSWORD_FILE` environment variable
+  - In Docker, when you use the -e option to pass environment variables, you typically use *POSTGRES_PASSWORD_FILE* instead of *POSTGRES_PASSWORD* for file-based password configuration because of how Docker processes environment variables and how the underlying system uses them.
+- You'll also pass the `-e`nvironment variables for `POSTGRES_USER` and `POSTGRES_DB`
+  - This isn't necessary because they are defined in the Dockerfile, so they are globally available within the container.
+  - It's useful to specify these values in the `run` command if you want to override the default values or pass different values.
+  - Specifying the user and database in the docker run command allows you to control the environment at runtime. More useful in production envrionments, less so for one-off projects like this
+- Finally, you'll map the container's `-p`ort 5432 to your `port:5432`
+
+#### Verifying a Successful Run
+To verify your container is running, you can use `docker ps` to get a list of active containers, their image, and other bits of information.
+
+```bash
+docker ps
+CONTAINER ID   IMAGE     COMMAND                  CREATED          STATUS          PORTS                    NAMES
+5793b64919f0   test      "docker-entrypoint.s…"   14 seconds ago   Up 13 seconds   0.0.0.0:5432->5432/tcp   pg_test
+```
+
+If you need to stop the running container, simply type:
+
+```bash
+docker kill pg_test
+```
+
+### Connecting to the PostgreSQL Server from your Command-Line Interface
+Now that the server is up and running, you can test an active connection (and your user permissions) from your CLI. To do so, run the following:
+
+
+```bash
+psql -h localhost -U chris -d test
+```
+
+- `psql` is the CLI command for postgres, in the same way `gh` is for GitHub
+- `-h` tells postgres that the server's host is ***localhost***
+- `-U` tells postgres to use the *user* ***chris***
+- `-d` tells postgres to connect to the database ***test***
+
+You can close that connection at any time by typing `\q`.
+
+::: {.callout-note}
+I'm working on a MacOS laptop and manage local packages (like Python, Docker, gh, and Postgres) with Homebrew. Even though I had PostgreSQLv17 installed, it wasn't added to my PATH for some reason. So, when I ran `psql ...` I got an error. To fix this, I simply edited the `~/.zshrc` (the MacOS default terminal *zsh* configuration file in my home directory) and added `export PATH="/opt/homebrew/opt/postgresql@17/bin:$PATH"`.
+:::
+
+### 
