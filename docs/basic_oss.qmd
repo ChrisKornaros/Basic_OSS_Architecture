@@ -114,4 +114,82 @@ Dbt also has the `docs/` and `dbt_packages/` folders which are for advanced docu
 
 The others are optional and provide functionality, that while useful and powerful in many cases, is not always needed. Now that we've got the local directory all configured, it's time to start building the container for our PostgreSQL instance (server, cluster, whatever you want to call it).
 
-### Docker and Containers
+## Docker and Containers
+Docker is a powerful open-source platform that simplifies the process of developing, packaging, and deploying applications using containers, which are lightweight, portable environments. Unlike traditional virtualization, which replicates an entire computer system, containers virtualize at the operating system (OS) level, creating isolated spaces where applications run with all their dependencies. By isolating apps in containers, Docker ensures that each environment is consistent across different systems, reducing conflicts caused by mismatched dependencies. This approach accelerates development, enhances portability, and enables scalability, making Docker a cornerstone of modern microservices architectures and containerized workflows.
+
+You can learn more about Docker either through their open source [documentation](https://docs.docker.com) or DataCamp's [course](https://app.datacamp.com/learn/courses/introduction-to-docker) by Tim Sangster!
+
+### The Dockerfile and Configuring Your Image
+
+The `Dockerfile` is the foundation of Docker image creation, serving as a script of instructions to define the environment and behavior of your containerized application. Each instruction in the `Dockerfile` builds on the previous one, forming layers that together create a Docker image.
+
+A `Dockerfile` is composed of various instructions, such as:
+
+- **FROM**: Specifies the base image to start with. Always begin with this instruction.
+  ```dockerfile
+  FROM postgres
+  ```
+- **RUN**: Executes shell commands during the build process and creates a new layer.
+  ```dockerfile
+  RUN apt-get update
+  ```
+- **COPY/ADD**: Transfers files from your local system into the image.
+  ```dockerfile
+  COPY app.py /usr/home/scripts
+  ```
+- **WORKDIR**: Sets the working directory for subsequent instructions.
+  ```dockerfile
+  WORKDIR /usr/home/scripts
+  ```
+- **CMD**: Specifies the default command to run when the container starts. Unlike `RUN`, `CMD` is executed at runtime.
+  ```dockerfile
+  CMD ["pwd"]
+  ```
+
+#### Optimizing Builds with Caching
+
+Docker employs a layer-caching mechanism to optimize builds. Each instruction in the `Dockerfile` forms a layer, and Docker reuses unchanged layers in subsequent builds to save time. For example:
+
+```dockerfile
+RUN apt-get update
+RUN apt-get install -y python3
+```
+
+If you rebuild and these instructions remain unchanged, Docker uses cached results. However, if the base image or any instruction changes, the cache is invalidated for that layer and subsequent ones.
+
+::: {.callout-tip title="Maximize Cache Efficiency"}
+Reorder `Dockerfile` instructions to maximize cache efficiency. Place less frequently changing instructions higher in the file. Then, place the layers you need to test changes in more frequently, lower in the file.
+::: 
+
+#### Using Variables in Dockerfiles
+
+Variables make `Dockerfiles` more flexible and maintainable.
+
+- **ARG**: Sets build-time variables.
+  ```dockerfile
+  ARG APP_PORT=5000
+  RUN echo "Application port: $APP_PORT"
+  ```
+  `ARG` values are accessible only during the build process.
+
+- **ENV**: Sets environment variables for runtime.
+  ```dockerfile
+  ENV APP_ENV=production
+  ```
+  These variables persist after the image is built and can be overridden when running the container using the `--env` flag.
+
+::: {.callout-important title="Credentials"} 
+Avoid storing sensitive data like credentials in `ARG` or `ENV`, as they are visible in the image’s history.
+:::
+
+#### Security Best Practices
+
+1. **Use Official Images**: Base your `Dockerfile` on trusted, well-maintained images from sources like Docker Hub.
+2. **Minimize Packages**: Install only what your application needs to reduce potential vulnerabilities.
+3. **Avoid Root Users**: Run applications with restricted permissions by creating a non-root user:
+   ```dockerfile
+   RUN useradd -m appuser
+   USER appuser
+   ```
+4. **Update Regularly**: Keep your base images and software dependencies up to date.
+
