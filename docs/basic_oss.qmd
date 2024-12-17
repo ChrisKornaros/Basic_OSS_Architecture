@@ -10,7 +10,7 @@ The purpose of this project is to showcase the power of open source tools when d
 
 ## Project Initialization
 ### First Steps
-Let's start from scratch, a blank [VS Code](https://www.code.visualstudio.com/) IDE. We'll do everything from the command line, so make sure to open that up (Ctrl-`).
+Let's start from scratch, a blank [VS Code](https://www.code.visualstudio.com/) IDE. I'll do everything from the command line, so make sure to open that up (Ctrl-`).
 
 ![Blank IDE](images/blank_vscode_ide.png)
 
@@ -53,6 +53,7 @@ dependencies = [
     "dbt-duckdb>=1.9.1",
     "dbt-postgres>=1.9.0",
     "duckdb>=1.1.3",
+    "fsspec>=2024.10.0",
     "great-expectations>=0.18.22",
     "jupyter>=1.1.1",
     "pandas>=2.2.3",
@@ -70,7 +71,7 @@ Below is an example of my file at this early project stage.
 ![](images/gitignore_sample.png)
 
 ### Initializing a Data Environment
-Now, you'll be setting up dbt. Similar to the other CLI tools, dbt uses the `dbt init` command to create the folder structure necessary for the program to be effective. As you can see below, the process is very easy. You'll only enter a name for your project, which will (case sensitively) become the name of the dbt directory. Next, we'll walk through the fundamental pieces of a dbt project in depth. 
+Now, you'll be setting up dbt. Similar to the other CLI tools, dbt uses the `dbt init` command to create the folder structure necessary for the program to be effective. As you can see below, the process is very easy. You'll only enter a name for your project, which will (case sensitively) become the name of the dbt directory. Next, I'll walk through the fundamental pieces of a dbt project in depth. 
 
 ![](images/dbt_init.png)
 
@@ -122,7 +123,7 @@ Dbt also has the `docs/` and `dbt_packages/` folders which are for advanced docu
 3. `macros/`
 4. `dbt_project.yml`
 
-The others are optional and provide functionality, that while useful and powerful in many cases, is not always needed. Now that we've got the local directory all configured, it's time to start building the container for our PostgreSQL instance (server, cluster, whatever you want to call it).
+The others are optional and provide functionality, that while useful and powerful in many cases, is not always needed. Now that I've got the local directory all configured, it's time to start building the container for my PostgreSQL instance (server, cluster, whatever you want to call it).
 
 ## Docker and Containers
 Docker is a powerful open-source platform that simplifies the process of developing, packaging, and deploying applications using containers, which are lightweight, portable environments. Unlike traditional virtualization, which replicates an entire computer system, containers virtualize at the operating system (OS) level, creating isolated spaces where applications run with all their dependencies. By isolating apps in containers, Docker ensures that each environment is consistent across different systems, reducing conflicts caused by mismatched dependencies. This approach accelerates development, enhances portability, and enables scalability, making Docker a cornerstone of modern microservices architectures and containerized workflows.
@@ -362,7 +363,7 @@ Here are some other useful commands that will not be useful with a fresh databas
 - `\d table_name` lists all columns in a table with name *table_name*
 - `\di table_name` lists all indexes for a table with name *table_name*
 
-Finally, to really dive into a specific database, you'll use the `\c` command, but in our case we connected when we first ran the `psql` command. If you just type `psql` without the `-d` flag, you'll simply connect to a server in general, not a specific database.
+Finally, to really dive into a specific database, you'll use the `\c` command, but in my case I connected when I first ran the `psql` command. If you just type `psql` without the `-d` flag, you'll simply connect to a server in general, not a specific database.
 
 At this point, the initial project configuration is just about done. The next steps involve initializing the persistent DuckDB database to use as the Dev/Test environment and defining the raw data model with dbt. For now, you can close the connection to the Postgres server and shutdown container. 
 
@@ -419,7 +420,7 @@ D SELECT * FROM duckdb_tables();
 
 ![](images/duckdb_init.png)
 
-You can then run `ls -lh` to verify the file exists, and to see some basic file metadata: read/write/executable permissions, author, file size, last edited. Next, we need to configure DuckDB to work with dbt.
+You can then run `ls -lh` to verify the file exists, and to see some basic file metadata: read/write/executable permissions, author, file size, last edited. Next, I need to configure DuckDB to work with dbt.
 
 ## dbt
 Up to this point, I've initialized the project environment and outside of a few lines of code, most of the work has been automated:
@@ -516,5 +517,79 @@ uv tool run dbt debug --profile basic_oss --target prod --project-dir basic_oss
 ![](images/dbt_postgres_no_bug.png)
 
 ## Data Selection and Ingestion
-Now that we have the environment good to go, the databases configured, and dbt connected, it's time to pick a dataset 
+Now that I have the environment good to go, the databases configured, and dbt connected, it's time to pick a dataset and start building the data model. To do this, I'm first going to add a directory for notebooks (eventually I'll add one for scripts) and then create a Jupyter notebook. I prefer developing in notebook simply because I can quickly change and test code as I'm iterating. Then, as a reminder, if you haven't installed the Python dependencies, you can do so with `uv add`.
+
+In the following block, you'll see me use `code`. This command is the VS Code CLI tool, you can learn more [here](https://code.visualstudio.com/docs/editor/command-line).
+
+```bash
+mkdir notebooks
+code notebooks/api_axploration.ipynb
+
+uv add dbt-core # The core dbt package, needed for base functionality
+uv add dbt-duckdb # The DuckDB extension, needed to connect with dbt
+uv add dbt-postgres # The postgres extension, needed to conenct with dbt
+uv add duckdb # DuckDB Python package
+uv add fsspec # Dependency for DuckDB JSON functionality
+uv add great-expectations # GX is for data validation/quality, later on
+uv add jupyter # Jupyter will launch a Python kernel and makes the notebooks possible
+uv add pandas # For standard functionality
+uv add pytest # For testing actualy pipeline/script performance, not so much data quality
+uv add quarto # For documentation
+uv add requests # For making API calls
+```
+
+### Configuring and Running a Jupyter Server
+Before you can use the notebook, you'll need to launch and connect to a jupyter server. When developing locally, and not sharing your code or compiled code anywhere, it's much easier to not require an authentication token. To allow this behavior, you'll need to modify your jupyter configuration. 
+
+I modified my global configuration, because I would have to reconfigure jupyter with every project if I did it in the specific project directory. That being said, I'll include the local example as well.
+
+```bash
+# For the global configuration
+code ~/.jupyter/jupyter_server_config.py
+
+c.ServerApp.token = '' # Find this in the .py file, set the value to '' which means nothing
+```
+
+```bash
+# For the local configuration
+mkdir .jupyter
+code .jupyter/jupyter_server_config.py
+
+c.IdentityProvider.token = ''
+```
+
+As you can see, the process is similar, you'll just manually create the `.jupyter/` folder in your project directory first. THe next step is to start the server. Then, you'll see an ouput similar to the image below. It will tell you useful information like the server address (**localhost** in this case), version, et cetera; however, you can now leave that terminal window be, it will continue to run in the background. If you need to stop the server, just go back to the window and hit `Ctrl-C`. 
+
+
+```bash
+uv run jupyter server
+```
+
+![](images/jupyter_server_active.png)
+
+### Using The Notebook
+Now that the server is up and running, you can go back to the notebook you created. To use it, we'll first need to connect to the server (if you see the term `kernel` don't be surprised, that's what a single notebook runs on). Luckily, VS Code provides a really nice UI for connecting a notebook to the Jupyter server. In the images below, I'll walk you through the connection process. First begin by selecting `Select Kernel` in the top-right corner of the notebook UI. From there, VS Code's command palette (the search bar at the top of the window) will interactively walk you through the next steps.
+
+![Select Kernel](images/select_kernel_nb.png)
+![Host Address](images/jupyter_host.png)
+![HTTP Connection](images/yes_to_http.png)
+![Kernel Selection](images/select_kernel.png)
+![Server Name](images/server_name.png)
+
+Then, you can verify your connection by running the first cell (`Ctrl-Enter` on MacOS).
+
+![](images/kernel_connect_success.png)
+
+### GET-ting our Initial Data
+Now that everything is setup and we can actually run Python code within the notebook, it's time to pick an API and make a request to actually get the data. If you aren't sure where to start looking for an API, [PublicAPI](https://publicapi.dev) has a great site of publicly available datasets. Many of which are accesible both programmatically or through GUIs. 
+
+Before we jump into the code, two quick notes about HTTP and GET:
+
+> These are protocols used for transferring data over the internet. 
+> `HTTP` (HyperText Transfer Protocol) and `HTTPS` (Secure HyperText Transfer Protocol) are foundational protocols that allow web browsers and servers to communicate with each other. 
+> HTTPS adds a layer of security by encrypting the data exchanged between the client and the server.
+> `GET` is one of the most common HTTP methods used to request data from a specified resource. 
+> It retrieves information from the server without making any changes. 
+> This method is used when you want to fetch data, such as retrieving data from an API endpoint. 
+> It is simple and effective for read-only operations, such as querying data from a database or fetching information from a web service.
 
