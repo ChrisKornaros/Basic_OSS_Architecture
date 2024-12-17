@@ -441,7 +441,9 @@ Now, it's time to start connecting everything, which is exactly what dbt does be
 Learn more about getting started with [dbt](https://docs.getdbt.com/guides/manual-install?step=1).
 
 ### Configuring Database Connections with dbt
-There are two contexts when working with dbt locally: the ***project*** dbt directory and the ***global*** dbt configuration. The first is what I initialized for the sake of this project using `dbt init`. The second is the `profiles.yml` file in the `~/.dbt` directory, which is used by dbt to connect to different databases. The file and folder should be created when you first install `dbt-core`. If the file isn't there, you can simply create one. The general syntax is as follows:
+There are two contexts when working with dbt locally: the ***project*** dbt directory and the ***global*** dbt configuration. The first is what I initialized for the sake of this project using `dbt init`. The second is the `profiles.yml` file in the `~/.dbt` directory, which is used by dbt to connect to different databases. You'll also need to install the specific connection type extensions, in this case `dbt-duckdb` and `dbt-postgres`-- both of these are added like any other dependency with `uv add`.
+
+The file and folder should be created when you first install `dbt-core`. If the file isn't there, you can simply create one. The general syntax is as follows:
 
 ```yaml
 basic_oss:
