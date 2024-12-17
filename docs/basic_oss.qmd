@@ -58,6 +58,7 @@ dependencies = [
     "pandas>=2.2.3",
     "pytest>=8.3.4",
     "quarto>=0.1.0",
+    "requests>=2.32.3",
 ]
 ```
 
@@ -513,4 +514,7 @@ uv tool run dbt debug --profile basic_oss --target prod --project-dir basic_oss
 
 ![](images/dbt_duckdb_no_bug.png)
 ![](images/dbt_postgres_no_bug.png)
+
+## Data Selection and Ingestion
+Now that we have the environment good to go, the databases configured, and dbt connected, it's time to pick a dataset 
 
