@@ -593,3 +593,53 @@ Before we jump into the code, two quick notes about HTTP and GET:
 > This method is used when you want to fetch data, such as retrieving data from an API endpoint. 
 > It is simple and effective for read-only operations, such as querying data from a database or fetching information from a web service.
 
+Next, you'll choose the API you want to server as your data source. I decided to use NASA's NEO (Near Earth Object) Feed for the following reasons:
+
+> `Dataset:` Information about NEOs, including size, orbital path, and speed.
+> `API Endpoint:` https://api.nasa.gov/neo/rest/v1/neo/browse?api_key={API key}
+> `Data Characteristics:` JSON structure with a list of NEOs, each containing details like id, name, nasa_jpl_url, absolute_magnitude_h, estimated_diameter, close_approach_date, and more.
+> `Use Case:` Ideal for a beginner, as it provides a simple JSON structure with basic information and is updated regularly.
+
+Besides my interest in space, the other perk of using NASA's API is that it's free and provides a reasonable amount (1,000) of hourly calls. That being said, the documentation isn't perfect, but it's definitely easy enough to query. Below, I'll share the first few cells of my notebook.
+
+
+```python
+# Import the required packages
+import requests
+import pprint
+import duckdb
+import pandas as pd
+```
+
+
+```python
+# Open a connection to the persistent database
+con = duckdb.connect('../test.duckdb')
+
+con.sql("SELECT * FROM duckdb_tables()") # Note: Don't use a semi colon in DuckDB for Python
+```
+
+```python
+# Store the base API information, for this, I'm using NASA's Near Earth Object (NEO) API
+api_key_path = "/Users/chriskornaros/Documents/local-scripts/.api_keys/nasa/key.txt"
+with open(api_key_path, 'r') as file:
+    api_key = file.read().strip()
+start_date, end_date = "2024-12-01", "2024-12-08"
+
+# Then Construct the URL with f-string formatting
+url = f"https://api.nasa.gov/neo/rest/v1/feed?start_date={start_date}&end_date={end_date}&api_key={api_key}"
+```
+
+```python
+# Standalone cell for the API response, ensures I don't call too many times
+response = requests.get(url)
+
+# Check if the response was successful, if so, print the data in a human readable format
+if response.status_code == 200:
+    data = response.json()
+    pprint.pprint(data)
+else:
+    print(f"Error: {response.status_code}")
+```
+
+### Creating the Raw Table
