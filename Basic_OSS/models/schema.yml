@@ -2,7 +2,44 @@ version: 1
 
 models:
   - name: asteroids
-    description: "A table containing detailed information about near-Earth objects, including their estimated dimensions, hazardous status, and close approach data."
+    description: "A table containing detailed information about near-Earth objects, including their estimated dimensions and close approach data, in metric units."
+    columns:
+      - name: id
+        description: "Unique identifier for the asteroid."
+      - name: neo_reference_id
+        description: "Reference ID assigned by NASA's Near Earth Object program."
+      - name: name
+        description: "Name or designation of the asteroid."
+      - name: close_approach_date
+        description: "The date of the asteroid's closest approach to Earth."
+      - name: close_approach_date_full
+        description: "Full timestamp of the asteroid's closest approach to Earth."
+      - name: epoch_date_close_approach
+        description: "Epoch timestamp of the asteroid's closest approach to Earth."
+      - name: absolute_magnitude_h
+        description: "Absolute magnitude (H) of the asteroid, a measure of its brightness."
+      - name: is_potentially_hazardous_asteroid
+        description: "Indicates whether the asteroid is considered potentially hazardous (true or false)."
+      - name: is_sentry_object
+        description: "Indicates whether the asteroid is a Sentry Object (true or false)."
+      - name: kilometers_per_second
+        description: "The asteroid's velocity relative to Earth, in kilometers per second."
+      - name: kilometers_per_hour
+        description: "The asteroid's velocity relative to Earth, in kilometers per hour."
+      - name: kilometers_miss
+        description: "The asteroid's miss distance from Earth, in kilometers."
+      - name: orbiting_body
+        description: "The celestial body the asteroid is orbiting (e.g., Earth)."
+      - name: km_estimated_diameter_min
+        description: "Minimum estimated diameter of the asteroid in kilometers."
+      - name: km_estimated_diameter_max
+        description: "Maximum estimated diameter of the asteroid in kilometers."
+      - name: meters_estimated_diameter_min
+        description: "Minimum estimated diameter of the asteroid in meters."
+      - name: meters_estimated_diameter_max
+        description: "Maximum estimated diameter of the asteroid in meters."
+  - name: raw
+    description: "A table containing the non-formatted API data"
     columns:
       - name: id
         description: "Unique identifier for the asteroid."
@@ -16,21 +53,21 @@ models:
         description: "Indicates whether the asteroid is considered potentially hazardous (true or false)."
       - name: is_sentry_object
         description: "Indicates whether the asteroid is a Sentry Object (true or false)."
-      - name: estimated_diameter_kilometers_min
+      - name: estimated_diameter.kilometers.estimated_diameter_min
         description: "Minimum estimated diameter of the asteroid in kilometers."
-      - name: estimated_diameter_kilometers_max
+      - name: estimated_diameter.kilometers.estimated_diameter_max
         description: "Maximum estimated diameter of the asteroid in kilometers."
-      - name: estimated_diameter_meters_min
+      - name: estimated_diameter.meters.estimated_diameter_min
         description: "Minimum estimated diameter of the asteroid in meters."
-      - name: estimated_diameter_meters_max
+      - name: estimated_diameter.meters.estimated_diameter_max
         description: "Maximum estimated diameter of the asteroid in meters."
-      - name: estimated_diameter_miles_min
+      - name: estimated_diameter.miles.estimated_diameter_min
         description: "Minimum estimated diameter of the asteroid in miles."
-      - name: estimated_diameter_miles_max
+      - name: estimated_diameter.miles.estimated_diameter_max
         description: "Maximum estimated diameter of the asteroid in miles."
-      - name: estimated_diameter_feet_min
+      - name: estimated_diameter.feet.estimated_diameter_min
         description: "Minimum estimated diameter of the asteroid in feet."
-      - name: estimated_diameter_feet_max
+      - name: estimated_diameter.feet.estimated_diameter_max
         description: "Maximum estimated diameter of the asteroid in feet."
       - name: close_approach_date
         description: "The date of the asteroid's closest approach to Earth."
