@@ -611,10 +611,13 @@ import duckdb
 import pandas as pd
 ```
 
+::: {.callout-tip title="Notebook Context"}
+If you're using VS Code, Jupyter notebook context is the parent directory that you opened the file from. In my case `code notebooks/api_exploration.ipynb` resulted in the context being the root dir above notebooks (`Basic_OSS_Architecture/`), instead of notebooks. So, I was initially connecting to a persistent DuckDB file created in my Documents directory, instead of the file within my project directory because my connection string below was `../test.duckdb` instead of `test.duckdb`. As a result, I wasn't able to interact with the environment from my CLI. 
+:::
 
 ```python
 # Open a connection to the persistent database
-con = duckdb.connect('../test.duckdb')
+con = duckdb.connect('/test.duckdb')
 duckdb.install_extension("httpfs") # Lets you directly query HTTP endpoints
 duckdb.load_extension("httpfs") # Trying this functionality out to simplify the ETL process
 
