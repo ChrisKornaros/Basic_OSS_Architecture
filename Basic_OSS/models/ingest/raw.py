@@ -69,7 +69,7 @@ def process_data(data, date):
     unnested_data = duckdb.sql("""SELECT * EXCLUDE(nasa_jpl_url, close_approach_data, 'links.self')
                                 , unnest(close_approach_data, recursive := true)
                                 FROM {a}
-                                """).fetchdf().format(a=flat_data)
+                                """).fetchdf().format(a=flat_data) # Test this
 
     return unnested_data
 
