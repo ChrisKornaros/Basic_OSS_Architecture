@@ -60,6 +60,7 @@ dependencies = [
     "pytest>=8.3.4",
     "quarto>=0.1.0",
     "requests>=2.32.3",
+    "ruff>=0.8.4",
 ]
 ```
 
@@ -499,6 +500,18 @@ snapshot-paths: ["snapshots"]
 clean-targets:         # directories to be removed by `dbt clean`
   - "target"
   - "dbt_packages"
+  - "logs"
+
+models:
+  basic_oss:
+    ingest:
+      +schema: ingest
+      +materialized: table
+      +enabled: true
+    stage:
+      +schema: stage
+      +materialized: table
+      +enabled: true
 ```
 
 Once you have those files configured and saved, you can verify that things were done correctly by running the code below and seeing a similar output to the subsequent image.
@@ -536,6 +549,7 @@ uv add pandas # For standard functionality
 uv add pytest # For testing actualy pipeline/script performance, not so much data quality
 uv add quarto # For documentation
 uv add requests # For making API calls
+uv add ruff # An extremly fast Python linter made by Astral, the makers of uv
 ```
 
 ### Configuring and Running a Jupyter Server

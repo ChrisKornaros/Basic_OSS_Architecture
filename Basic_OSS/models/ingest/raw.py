@@ -2,7 +2,7 @@
 import requests
 import duckdb
 import pandas as pd
-from datetime import datetime, timedelta
+from datetime import datetime
 
 
 def read_api_key(file_path):
@@ -56,7 +56,7 @@ def fetch_data(url):
 
 def process_data(data, date):
     """
-    Processes the API response data.
+    Processes the API response data using Pandas and DuckDB.
 
     Args:
         data (dict): The JSON response from the API.
@@ -65,7 +65,13 @@ def process_data(data, date):
     Returns:
         DataFrame: The processed data as a pandas DataFrame.
     """
-    return pd.json_normalize(data["near_earth_objects"][date])
+    flat_data = pd.json_normalize(data["near_earth_objects"][date])
+    unnested_data = duckdb.sql("""SELECT * EXCLUDE(nasa_jpl_url, close_approach_data, 'links.self')
+                                , unnest(close_approach_data, recursive := true)
+                                FROM {a}
+                                """).fetchdf().format(a=flat_data)
+
+    return unnested_data
 
 
 def model(dbt, session):
