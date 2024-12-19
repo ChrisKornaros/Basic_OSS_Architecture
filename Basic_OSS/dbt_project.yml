@@ -20,3 +20,15 @@ snapshot-paths: ["snapshots"]
 clean-targets:         # directories to be removed by `dbt clean`
   - "target"
   - "dbt_packages"
+  - "logs"
+
+models:
+  basic_oss:
+    ingest:
+      +schema: ingest
+      +materialized: table
+      +enabled: true
+    stage:
+      +schema: stage
+      +materialized: table
+      +enabled: true

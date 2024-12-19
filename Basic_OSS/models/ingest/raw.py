@@ -68,54 +68,28 @@ def process_data(data, date):
     return pd.json_normalize(data["near_earth_objects"][date])
 
 
-def store_data_in_duckdb(con, data):
-    """
-    Stores the processed data in DuckDB.
-
-    Args:
-        con (duckdb.DuckDBPyConnection): The DuckDB connection.
-        data (DataFrame): The processed data.
-    """
-    con.sql("""
-        CREATE TABLE IF NOT EXISTS asteroids AS
-        SELECT * EXCLUDE(nasa_jpl_url, close_approach_data, 'links.self')
-        , unnest(close_approach_data, recursive := true)
-        FROM data
-    """)
-
-
-def main():
+def model(dbt, session):
     """
     Main function to execute the data ingestion process.
+    Returns a single DataFrame object.
     """
     api_key_path = "/Users/chriskornaros/Documents/local-scripts/.api_keys/nasa/key.txt"
     api_key = read_api_key(api_key_path)
-    start_date = datetime.strptime("1900-01-01", "%Y-%m-%d")
-    end_date = datetime.today()
+    start_date = "1900-01-01"
+    end_date = datetime.today().strftime("%Y-%m-%d")
 
-    con = duckdb.connect("test.duckdb")
+    url = construct_url(api_key, start_date, end_date)
 
-    current_date = start_date
-    while current_date <= end_date:
-        next_date = current_date + timedelta(days=7)
-        url = construct_url(
-            api_key, current_date.strftime("%Y-%m-%d"), next_date.strftime("%Y-%m-%d")
-        )
+    try:
+        data = fetch_data(url)
+        final_data = process_data(data)
+    except Exception as e:
+        print(f"Failed to fetch data: {e}")
+        final_data = pd.DataFrame()
 
-        try:
-            data = fetch_data(url)
-            for date in data["near_earth_objects"]:
-                flat_data = process_data(data, date)
-                store_data_in_duckdb(con, flat_data)
-        except Exception as e:
-            print(
-                f"Failed to fetch data for {current_date.strftime('%Y-%m-%d')} to {next_date.strftime('%Y-%m-%d')}: {e}"
-            )
-
-        current_date = next_date
-
-    con.close()
+    return final_data
 
 
 if __name__ == "__main__":
-    main()
+    result = model()
+    print(result)
