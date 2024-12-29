@@ -2,7 +2,7 @@
 import requests
 import duckdb
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 def read_api_key(file_path):
@@ -54,37 +54,60 @@ def fetch_data(url):
         raise Exception(f"Error: {response.status_code}")
 
 
-def process_data(data, date):
+def process_data(data):
     """
-    Processes the API response data using Pandas and DuckDB.
+    Processes the API response data.
 
     Args:
         data (dict): The JSON response from the API.
-        date (str): The date for which to process the data.
 
     Returns:
         DataFrame: The processed data as a pandas DataFrame.
     """
-    flat_data = pd.json_normalize(data["near_earth_objects"][date])
-    unnested_data = duckdb.sql("""SELECT * EXCLUDE(nasa_jpl_url, close_approach_data, 'links.self')
-                                , unnest(close_approach_data, recursive := true)
-                                FROM {a}
-                                """).fetchdf().format(a=flat_data) # Test this
+    all_data = []
+    for date in data["near_earth_objects"]:
+        flat_data = pd.json_normalize(data["near_earth_objects"][date])
+        all_data.append(flat_data)
 
-    return unnested_data
+    if all_data:
+        final_data = pd.concat(all_data, ignore_index=True)
+    else:
+        final_data = pd.DataFrame()
+
+    return final_data
 
 
-def model(dbt, session):
+def store_data_in_duckdb(con, data):
+    """
+    Stores the processed data in DuckDB.
+
+    Args:
+        con (duckdb.DuckDBPyConnection): The DuckDB connection.
+        data (DataFrame): The processed data.
+    """
+    con.sql("""
+        CREATE TABLE IF NOT EXISTS asteroids AS
+        SELECT * EXCLUDE(nasa_jpl_url, close_approach_data, 'links.self')
+        , unnest(close_approach_data, recursive := true)
+        FROM data
+    """)
+
+
+def main():
     """
     Main function to execute the data ingestion process.
     Returns a single DataFrame object.
     """
     api_key_path = "/Users/chriskornaros/Documents/local-scripts/.api_keys/nasa/key.txt"
     api_key = read_api_key(api_key_path)
-    start_date = "1900-01-01"
-    end_date = datetime.today().strftime("%Y-%m-%d")
 
-    url = construct_url(api_key, start_date, end_date)
+    # Define the start date and end date for the 7-day window
+    start_date = datetime.strptime("1900-01-01", "%Y-%m-%d")
+    end_date = start_date + timedelta(days=7)
+
+    url = construct_url(
+        api_key, start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d")
+    )
 
     try:
         data = fetch_data(url)
@@ -93,9 +116,22 @@ def model(dbt, session):
         print(f"Failed to fetch data: {e}")
         final_data = pd.DataFrame()
 
+    # Open a connection to the persistent database
+    con = duckdb.connect("test.duckdb")
+
+    # Store the data in DuckDB
+    store_data_in_duckdb(con, final_data)
+
+    # Verify the data was stored correctly
+    result = con.sql("SELECT * FROM asteroids").fetchdf()
+    print(result)
+
+    # Close the connection
+    con.close()
+
     return final_data
 
 
 if __name__ == "__main__":
-    result = model()
-    print(result)
+    df = main()
+    print(df)
