@@ -913,3 +913,9 @@ FROM a_raw
 
 ### Running your models
 Now that everything is ready, it's finally time for dbt to shine! To ensure functionality, as I expect it, I like to `cd dbt_dir/` before running the models. Then, once I'm in the dbt project directory, all I have to do is execute `dbt run` from my CLI for DBT to start exectuing scripts. That being said, if you only want to test or run a specific model, you can tell dbt exactly which folder to look at using `dbt run --select ingest`. Just know, even though you may only run one specific folder, dbt will throw an error if there is an issue with a model in another subfolder.
+
+## Next Steps
+- Setup my Raspberry Pi server so I have an always-running VM for job orchestration
+- Setup Airflow to schedule the jobs, so every 15 minutes the API is called
+  - This won't break the API rules and will take about 2 months to get all existing data
+- Continue with the rest of the vision/integrations
